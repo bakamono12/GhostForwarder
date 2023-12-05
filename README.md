@@ -1,6 +1,6 @@
 # GhostForwarder
 
-GhostForwarder is a Telegram bot designed to simplify media transfer from chats with anti-forward/copy restrictions to your specified destination chats. With GhostForwarder, you can seamlessly move media files while preserving the privacy and integrity of your interactions.
+GhostForwarder is a Telegram bot based on pyrogram, designed to simplify media transfer from chats with anti-forward/copy restrictions to your specified destination chats. With GhostForwarder, you can seamlessly move media files while preserving the privacy and integrity of your interactions.
 
 ## Features
 
@@ -13,28 +13,40 @@ GhostForwarder is a Telegram bot designed to simplify media transfer from chats 
 
 1. **Authentication:**
    - Authenticate GhostForwarder with your Telegram account.
-   - Use the `auth` file to authenticate the app.
+   - Use the `auth` file to authenticate the app or ...
+   - Use [![Run on Repl.it](https://replit.com/badge/github/bakamono12/GhostForwarder)](https://replit.com/@baka1432/PyroGramAuth) to get the `session string`.
 
 2. **Source Chat Specification:**
-   - Specify the source chat ID with anti-forward/copy restrictions.
+   - Specify the source chat ID with anti-forward/copy restrictions, use the `/help` command to know more.
 
 3. **Destination Chat Selection:**
-   - Choose the destination chat ID for the transferred media.
+   - Saved Message will be used for the transferred media or any update error.
 
 4. **Media Transfer:**
-   - Now media items can be transferred using the source chat ID or let GhostForwarder handle the process automatically.
+   - Now media items can be transferred from the sources chat IDs once you request anyfile or receive any video files in  mentioned chats.
 
 5. **Enjoy:**
    - Sit back and enjoy hassle-free media transfer while preserving the privacy of your communications.
 
 ## Getting Started
 
-To get started with GhostForwarder, follow these steps:
+To get started with GhostForwarder, follow these steps to run the application locally:
 
 1. Clone the repository.
 2. Set up the necessary environment variables.
 3. Install dependencies using `pip install` [requirements.txt](requirements.txt).
 4. Run the application using `python -m main.py`.
+
+## Deployment
+Deployment is easy, you can deploy GhostForwarder on Heroku or Railway.\
+1. Fork this repository.
+2. Go to Railway or Heroku and create a new app.
+3. Connect your forked repository to the app.
+4. And Wait for the build to start.
+5. In environment variable section, add the following variables:
+   - `SESSION_STRING` : Get it from [![Run on Repl.it](https://replit.com/badge/github/bakamono12/GhostForwarder)](https://replit.com/@baka1432/PyroGramAuth).
+6. Restart the app and enjoy.
+7. To check if app is live or not, use `/boomer` command in Saved Messages or Any Chat.
 
 ## Contributing
 
