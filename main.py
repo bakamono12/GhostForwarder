@@ -156,7 +156,7 @@ def index():
 def main():
     # Use the PORT environment variable provided by Heroku
     port = int(os.environ.get('PORT', 5000))
-
+    bot.run()
     # Start your Flask app
     app.run(host='0.0.0.0', port=port)
 
