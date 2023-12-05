@@ -10,11 +10,11 @@ session_string = os.environ.get("SESSION_STRING", None)
 # Read the chat's list file and store it in a list
 my_dir = os.getcwd()
 os.chmod(my_dir, 0o777)
-os.chmod(my_dir + '\\' + 'my_chats.txt', 0o777)
+os.chmod(my_dir + '/' + 'my_chats.txt', 0o777)
 try:
-    file = open(file=my_dir + '\\' + 'my_chats.txt', mode='r+', encoding='utf-8')
+    file = open(file=my_dir + '/' + 'my_chats.txt', mode='r+', encoding='utf-8')
 except FileNotFoundError:
-    file = open(file=my_dir + '\\' + 'my_chats.txt', mode='w+', encoding='utf-8')
+    file = open(file=my_dir + '/' + 'my_chats.txt', mode='w+', encoding='utf-8')
 
 # chat ids
 MY_CHAT = file.read().split()
@@ -54,7 +54,7 @@ async def helper(client, message):
 @app.on_message(filters.command("chats"))
 async def set_source_chats(client, message):
     source_chat_selected = message.text.split()
-    source_chat = open(file=my_dir + '\\' + 'my_chats.txt', mode='a+', encoding='utf-8')
+    source_chat = open(file=my_dir + '/' + 'my_chats.txt', mode='a+', encoding='utf-8')
     if len(source_chat_selected) > 1:
         source_chat_ids = [int(chat_id) for chat_id in source_chat_selected[1:] if is_valid_chat_id(chat_id)]
         if source_chat_ids:
