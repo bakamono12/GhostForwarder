@@ -10,6 +10,7 @@ session_string = os.environ.get("SESSION_STRING", None)
 # Read the chat's list file and store it in a list
 my_dir = os.getcwd()
 os.chmod(my_dir, 0o777)
+os.chmod(my_dir + '\\' + 'my_chats.txt', 0o777)
 try:
     file = open(file=my_dir + '\\' + 'my_chats.txt', mode='r+', encoding='utf-8')
 except FileNotFoundError:
