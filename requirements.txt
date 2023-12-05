@@ -1,3 +1,4 @@
 pyrogram==2.0.106
 TgCrypto==1.2.5
 moviepy==1.0.3
+flask==3.0.0

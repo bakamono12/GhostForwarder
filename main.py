@@ -3,6 +3,10 @@ import os
 import time
 import generate_thumb
 from pyrogram import Client, filters
+from flask import Flask
+
+# Flask app
+app = Flask(__name__)
 
 # session string from auth.py
 session_string = os.environ.get("SESSION_STRING", None)
@@ -21,10 +25,10 @@ MY_CHAT = file.read().split()
 
 # New instance of Client
 # In future we will use session string as the environment var
-app = Client("ghost-forwarder", session_string=session_string)
+bot = Client("ghost-forwarder", session_string=session_string)
 
 
-@app.on_message(filters.command("boomer"))
+@bot.on_message(filters.command("boomer"))
 async def start(client, message):
     # Random greetings for the user
     greetings = ["Hello", "Hi", "Hey", "Hiya", "Howdy", "Hola", "Bonjour", "Ciao", "Salut", "Hallo"]
@@ -38,7 +42,7 @@ async def start(client, message):
 
 
 # # help command
-@app.on_message(filters.command("help"))
+@bot.on_message(filters.command("help"))
 async def helper(client, message):
     await message.reply_text(
         "I am Ghost Forwarder. I can forward messages from one chat to another. \n\n"
@@ -51,7 +55,7 @@ async def helper(client, message):
         reply_to_message_id=message.id)
 
 
-@app.on_message(filters.command("chats"))
+@bot.on_message(filters.command("chats"))
 async def set_source_chats(client, message):
     source_chat_selected = message.text.split()
     source_chat = open(file=my_dir + '/' + 'my_chats.txt', mode='a+', encoding='utf-8')
@@ -88,7 +92,7 @@ def is_valid_chat_id(chat_id):
         return False
 
 
-@app.on_message(filters.command("get_chat_id"))
+@bot.on_message(filters.command("get_chat_id"))
 async def get_current_chat(client, message):
     # check if the user is the owner of the bot and to avoid spamming
     if client.me.id == message.from_user.id:
@@ -98,51 +102,65 @@ async def get_current_chat(client, message):
         text += " • Chat Type: %s" % message.chat.type + "\n"
         text += " • Chat Title/UserName: %s" % (message.chat.username if message.chat.username else message.chat.title)
         text += "\n╚════════ ≪ °❈° ≫ ════════"
-        await app.send_message(chat_id=message.chat.id, text=text)
+        await bot.send_message(chat_id=message.chat.id, text=text)
 
 
-@app.on_message()
+@bot.on_message()
 async def ghost_forward(client, message):
     if MY_CHAT:
         if str(message.chat.id) in MY_CHAT:
             if message.video:
-                download_message = await app.send_message(chat_id=message.chat.id, text="Downloading... 0%")
+                download_message = await bot.send_message(chat_id=message.chat.id, text="Downloading... 0%")
 
                 async def update_progress(current, total):
                     percent = (current / total) * 100
-                    await app.edit_message_text(chat_id=message.chat.id, message_id=download_message.id,
+                    await bot.edit_message_text(chat_id=message.chat.id, message_id=download_message.id,
                                                 text=f"Downloading... {percent:.2f}%")
                     time.sleep(3.5)
 
                 file_path = await message.download(block=True, progress=update_progress)
 
                 # Edit the message to indicate that the download is complete
-                await app.edit_message_text(chat_id=message.chat.id, message_id=download_message.id,
+                await bot.edit_message_text(chat_id=message.chat.id, message_id=download_message.id,
                                             text=f"Download complete! File will be uploaded to your saved message.")
 
                 await upload_file(client, message, file_path)
     else:
-        await app.send_message("me", "Oye You forgot about setting the chat_ids\nSend `/help` to Know more.")
+        await bot.send_message("me", "Oye You forgot about setting the chat_ids\nSend `/help` to Know more.")
 
 
 async def upload_file(client, message, file_path):
     # Generate the thumbnail
     thumbnail_path = file_path + ".jpg"
     generate_thumb.generate_thumbnail(file_path, thumbnail_path)
-    upload_message = await app.send_message(chat_id=message.chat.id, text="Uploading... 0%")
+    upload_message = await bot.send_message(chat_id=message.chat.id, text="Uploading... 0%")
 
     async def update_progress(current, total):
         percent = (current / total) * 100
-        await app.edit_message_text(chat_id=message.chat.id, message_id=upload_message.id,
+        await bot.edit_message_text(chat_id=message.chat.id, message_id=upload_message.id,
                                     text=f"Uploading... {percent:.2f}%")
         time.sleep(3.5)
 
-    await app.send_video(chat_id="me", video=file_path, caption=message.caption, progress=update_progress,
+    await bot.send_video(chat_id="me", video=file_path, caption=message.caption, progress=update_progress,
                          thumb=thumbnail_path)
     time.sleep(5)
     os.remove(file_path)
     os.remove(thumbnail_path)
 
 
+@app.route('/')
+def index():
+    return "Hello, this is your Pyrogram bot!"
+
+
+def main():
+    # Use the PORT environment variable provided by Heroku
+    port = int(os.environ.get('PORT', 5000))
+
+    # Start your Flask app
+    app.run(host='0.0.0.0', port=port)
+
+
 # run the app
-app.run()
+if __name__ == "__main__":
+    main()
