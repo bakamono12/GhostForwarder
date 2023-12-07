@@ -1,0 +1,27 @@
+{
+  "name": "Ghost Forward",
+  "description": "GhostForwarder is a Telegram bot based on pyrogram, designed to simplify media transfer from chats with anti-forward/copy restrictions to your specified destination chats. With GhostForwarder, you can seamlessly move media files while preserving the privacy and integrity of your interactions.\n",
+  "repository": "https://github.com/bakamono12/GhostForwarder",
+  "logo": "https://avatars1.githubusercontent.com/u/34474300?s=280&v=4",
+  "keywords": [
+    "python",
+    "pyrogram",
+    "telegram",
+    "bot",
+    "userbot",
+    "Forwarder"
+  ],
+  "image": "heroku/python",
+  "formation": {
+    "worker": {
+      "quantity": 1,
+      "size": "eco"
+    }
+  },
+  "env": {
+    "SESSION_STRING": {
+      "description": "Session string from auth.py file or use the Replit link button in README.md",
+      "required": true
+    }
+  }
+}
