@@ -2,6 +2,8 @@
 
 GhostForwarder is a Telegram bot based on pyrogram, designed to simplify media transfer from chats with anti-forward/copy restrictions to your specified destination chats. With GhostForwarder, you can seamlessly move media files while preserving the privacy and integrity of your interactions.
 
+![icon.jpg](images%2Ficon.jpg)
+
 ## Features
 
 - **Media Liberation:** Bypass anti-forward/copy restrictions and transfer media files, including photos and videos.
