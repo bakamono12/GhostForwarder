@@ -1,12 +1,8 @@
-import random
-import os
 import time
+import os
 import generate_thumb
+import random
 from pyrogram import Client, filters
-from flask import Flask
-
-# Flask app
-app = Flask(__name__)
 
 # session string from auth.py
 session_string = os.environ.get("SESSION_STRING", None)
@@ -105,7 +101,7 @@ async def get_current_chat(client, message):
         await bot.send_message(chat_id=message.chat.id, text=text)
 
 
-@bot.on_message()
+@bot.on_message(filters=filters.video)
 async def ghost_forward(client, message):
     if MY_CHAT:
         if str(message.chat.id) in MY_CHAT:
@@ -148,19 +144,5 @@ async def upload_file(client, message, file_path):
     os.remove(thumbnail_path)
 
 
-@app.route('/')
-def index():
-    return "Hello, this is your Pyrogram bot!"
-
-
-def main():
-    # Use the PORT environment variable provided by Heroku
-    port = int(os.environ.get('PORT', 5000))
-    bot.run()
-    # Start your Flask app
-    app.run(host='0.0.0.0', port=port)
-
-
 # run the app
-if __name__ == "__main__":
-    main()
+bot.run()

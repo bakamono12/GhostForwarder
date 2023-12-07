@@ -40,9 +40,9 @@ To get started with GhostForwarder, follow these steps to run the application lo
 ## Deployment
 Deployment is easy, you can deploy GhostForwarder on Heroku or Railway.\
 1. Fork this repository.
-2. Go to Railway or Heroku and create a new app.
-3. Connect your forked repository to the app.
-4. And Wait for the build to start.
+2. 
+3. [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+4. And Wait for the build to start..
 5. In environment variable section, add the following variables:
    - `SESSION_STRING` : Get it from [![Run on Repl.it](https://replit.com/badge/github/bakamono12/GhostForwarder)](https://replit.com/@baka1432/PyroGramAuth).
 6. Restart the app and enjoy.
