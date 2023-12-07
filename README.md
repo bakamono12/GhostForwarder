@@ -36,11 +36,12 @@ To get started with GhostForwarder, follow these steps to run the application lo
 2. Set up the necessary environment variables.
 3. Install dependencies using `pip install` [requirements.txt](requirements.txt).
 4. Run the application using `python -m main.py`.
+5. This Will run your app locally.
 
 ## Deployment
 Deployment is easy, you can deploy GhostForwarder on Heroku or Railway.\
 1. Fork this repository.
-2. 
+2. [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/qHge9_?referralCode=IEUhZ-)
 3. [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 4. And Wait for the build to start..
 5. In environment variable section, add the following variables:
