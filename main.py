@@ -34,18 +34,18 @@ def check_owner(func):
     return wrapper
 
 
+@check_owner
 @bot.on_message(filters.command("boomer"))
 async def start(client, message):
     # Random greetings for the user
-    if check_owner(message):
-        greetings = ["Hello", "Hi", "Hey", "Hiya", "Howdy", "Hola", "Bonjour", "Ciao", "Salut", "Hallo"]
-        greet = random.choice(greetings)
-        await message.reply_text(
-            "%s %s,\nI am Ghost Forwarder. I can forward messages from private chat that doesn't allow forward "
-            "to another chats. \n\n"
-            "To get started, send `/help` to know more." % (greet, message.from_user.first_name),
-            reply_to_message_id=message.id
-        )
+    greetings = ["Hello", "Hi", "Hey", "Hiya", "Howdy", "Hola", "Bonjour", "Ciao", "Salut", "Hallo"]
+    greet = random.choice(greetings)
+    await message.reply_text(
+        "%s %s,\nI am Ghost Forwarder. I can forward messages from private chat that doesn't allow forward "
+        "to another chats. \n\n"
+        "To get started, send `/help` to know more." % (greet, message.from_user.first_name),
+        reply_to_message_id=message.id
+    )
 
 
 # # help command
