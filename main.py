@@ -1,6 +1,6 @@
 import time
 import os
-import generate_thumb
+from generate_thumb import generate_thumbnail
 import random
 import logging
 from pyrogram import Client, filters
@@ -151,7 +151,7 @@ async def ghost_forward(client, message):
 async def upload_file(client, message, file_path):
     # Generate the thumbnail
     thumbnail_path = file_path + ".jpg"
-    generate_thumb.generate_thumbnail(file_path)
+    generate_thumbnail(file_path)
     upload_message = await bot.send_message(chat_id=message.chat.id, text="Uploading... 0%")
 
     async def update_progress(current, total):
