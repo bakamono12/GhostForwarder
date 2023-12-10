@@ -123,7 +123,6 @@ async def get_current_chat(client, message):
 
 
 @bot.on_message(filters=filters.video)
-@check_owner
 async def ghost_forward(client, message):
     if MY_CHAT:
         if str(message.chat.id) in MY_CHAT:
