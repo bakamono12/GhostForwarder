@@ -33,3 +33,5 @@ def video_to_thumbnail(video_filename):
         # Save the frame as an image file
         cv2.imwrite(video_filename + ".jpg", image)
     return image
+
+
