@@ -2,10 +2,14 @@ import time
 import os
 import generate_thumb
 import random
+import logging
 from pyrogram import Client, filters
 
 # session string from auth.py
 session_string = os.environ.get("SESSION_STRING", None)
+# logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Read the chat's list file and store it in a list
 my_dir = os.getcwd()
@@ -29,13 +33,16 @@ def check_owner(func):
         if client.me.id == message.from_user.id:
             await func(client, message)
         else:
-            pass
+            # log in logger if unauthorized user detected
+            # print("Unauthorized access from user: %s" % message.from_user.id)
+            logger.warning(
+                "Unauthorized access from user: %s - %s" % (message.from_user.first_name, message.from_user.id))
 
     return wrapper
 
 
-@check_owner
 @bot.on_message(filters.command("boomer"))
+@check_owner
 async def start(client, message):
     # Random greetings for the user
     greetings = ["Hello", "Hi", "Hey", "Hiya", "Howdy", "Hola", "Bonjour", "Ciao", "Salut", "Hallo"]
@@ -50,6 +57,7 @@ async def start(client, message):
 
 # # help command
 @bot.on_message(filters.command("help"))
+@check_owner
 async def helper(client, message):
     await message.reply_text(
         "I am Ghost Forwarder. I can forward messages from one chat to another. \n\n"
@@ -63,6 +71,7 @@ async def helper(client, message):
 
 
 @bot.on_message(filters.command("chats"))
+@check_owner
 async def set_source_chats(client, message):
     source_chat_selected = message.text.split()
     source_chat = open(file=my_dir + '/' + 'my_chats.txt', mode='a+', encoding='utf-8')
@@ -100,6 +109,7 @@ def is_valid_chat_id(chat_id):
 
 
 @bot.on_message(filters.command("get_chat_id"))
+@check_owner
 async def get_current_chat(client, message):
     # check if the user is the owner of the bot and to avoid spamming
     if client.me.id == message.from_user.id:
@@ -113,6 +123,7 @@ async def get_current_chat(client, message):
 
 
 @bot.on_message(filters=filters.video)
+@check_owner
 async def ghost_forward(client, message):
     if MY_CHAT:
         if str(message.chat.id) in MY_CHAT:
@@ -130,6 +141,7 @@ async def ghost_forward(client, message):
                 # Edit the message to indicate that the download is complete
                 await bot.edit_message_text(chat_id=message.chat.id, message_id=download_message.id,
                                             text=f"Download complete! File will be uploaded to your saved message.")
+                await bot.delete_messages(chat_id=message.chat.id, message_ids=download_message.id)
 
                 await upload_file(client, message, file_path)
     else:
@@ -139,7 +151,7 @@ async def ghost_forward(client, message):
 async def upload_file(client, message, file_path):
     # Generate the thumbnail
     thumbnail_path = file_path + ".jpg"
-    generate_thumb.generate_thumbnail(file_path, thumbnail_path)
+    generate_thumb.generate_thumbnail(file_path)
     upload_message = await bot.send_message(chat_id=message.chat.id, text="Uploading... 0%")
 
     async def update_progress(current, total):
@@ -153,6 +165,7 @@ async def upload_file(client, message, file_path):
     time.sleep(5)
     os.remove(file_path)
     os.remove(thumbnail_path)
+    await bot.delete_messages(chat_id=message.chat.id, message_ids=upload_message.id)
 
 
 # run the app
