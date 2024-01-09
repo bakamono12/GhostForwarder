@@ -1,12 +1,14 @@
+import asyncio
 import time
 import os
-from generate_thumb import generate_thumbnail
+from generate_thumb import extract_screenshot
 import random
 import logging
 from pyrogram import Client, filters
 
 # session string from auth.py
 session_string = os.environ.get("SESSION_STRING", None)
+group_id = os.environ.get("GROUP", None)
 # logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -108,6 +110,17 @@ def is_valid_chat_id(chat_id):
         return False
 
 
+async def file_size_formatter(file_size):
+    if file_size < 1024:
+        return f"{file_size} Bytes"
+    elif 1024 <= file_size < 1048576:
+        return f"{file_size / 1024:.2f} KB"
+    elif 1048576 <= file_size < 1073741824:
+        return f"{file_size / 1048576:.2f} MB"
+    elif 1073741824 <= file_size:
+        return f"{file_size / 1073741824:.2f} GB"
+
+
 @bot.on_message(filters.command("get_chat_id"))
 @check_owner
 async def get_current_chat(client, message):
@@ -122,46 +135,61 @@ async def get_current_chat(client, message):
         await bot.send_message(chat_id=message.chat.id, text=text)
 
 
+# @bot.on_message(filters.command("cancel"))
+async def update_my_progress(current, total, message=None, download_message=None, is_upload=False):
+    percent = (current / total) * 100
+    new_message = download_message.text.markdown + f"\nDownloading... {percent:.2f}%" if not is_upload \
+        else f"Uploading... {percent:.2f}%"
+    await bot.edit_message_text(chat_id=message.chat.id, message_id=download_message.id,
+                                text=new_message,
+                                )
+    await asyncio.sleep(3.5)
+
+
 @bot.on_message(filters=filters.video)
 async def ghost_forward(client, message):
     if MY_CHAT:
         if str(message.chat.id) in MY_CHAT:
             if message.video:
-                download_message = await bot.send_message(chat_id=message.chat.id, text="Downloading... 0%")
-
-                async def update_progress(current, total):
-                    percent = (current / total) * 100
-                    await bot.edit_message_text(chat_id=message.chat.id, message_id=download_message.id,
-                                                text=f"Downloading... {percent:.2f}%")
-                    time.sleep(3.5)
-
-                file_path = await message.download(block=True, progress=update_progress)
-
+                message_text = ("**Downloading...**\n**File Name:** `{}`\n**File Size:** `{}`\n**File ID:** `{}`\n\n"
+                                "to Cancel this Download send `/cancel {}`").format(
+                    message.video.file_name or "Not Available",
+                    await file_size_formatter(
+                        message.video.file_size),
+                    message.video.file_id,
+                    message.video.file_id)
+                download_message = await bot.send_message(chat_id=message.chat.id, text=message_text,
+                                                          reply_to_message_id=message.id)
+                file_path = await message.download(block=True, progress=update_my_progress,
+                                                   progress_args=(message, download_message, False))
                 # Edit the message to indicate that the download is complete
                 await bot.edit_message_text(chat_id=message.chat.id, message_id=download_message.id,
                                             text=f"Download complete! File will be uploaded to your saved message.")
                 await bot.delete_messages(chat_id=message.chat.id, message_ids=download_message.id)
-
                 await upload_file(client, message, file_path)
     else:
         await bot.send_message("me", "Oye You forgot about setting the chat_ids\nSend `/help` to Know more.")
 
 
+# Implement your upload_file function and any other necessary functions
+
+
 async def upload_file(client, message, file_path):
     # Generate the thumbnail
     thumbnail_path = file_path + ".jpg"
-    generate_thumbnail(file_path)
-    upload_message = await bot.send_message(chat_id=message.chat.id, text="Uploading... 0%")
+    extract_screenshot(file_path)
+    message_text = """**Uploading...**\n
+                    **File Name:** `{}`\n
+                    **File Size:** `{}`\n
+                    **File ID:** `{}`\n
+                    """.format(message.video.file_name, await file_size_formatter(message.video.file_size),
+                               message.video.file_id)
+    upload_message = await bot.send_message(chat_id=message.chat.id, text=message_text, reply_to_message_id=message.id)
 
-    async def update_progress(current, total):
-        percent = (current / total) * 100
-        await bot.edit_message_text(chat_id=message.chat.id, message_id=upload_message.id,
-                                    text=f"Uploading... {percent:.2f}%")
-        time.sleep(3.5)
-
-    await bot.send_video(chat_id="me", video=file_path, caption=message.caption, progress=update_progress,
+    await bot.send_video(chat_id=group_id, video=file_path, caption=message.caption, progress=update_my_progress,
+                         progress_args=(message, upload_message),
                          thumb=thumbnail_path)
-    time.sleep(5)
+    await asyncio.sleep(5)
     os.remove(file_path)
     os.remove(thumbnail_path)
     await bot.delete_messages(chat_id=message.chat.id, message_ids=upload_message.id)
