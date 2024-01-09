@@ -177,7 +177,7 @@ async def ghost_forward(client, message):
 async def upload_file(client, message, file_path):
     # Generate the thumbnail
     thumbnail_path = file_path + ".jpg"
-    extract_screenshot(file_path)
+    width, height, duration = extract_screenshot(file_path)
     message_text = """**Uploading...**\n
                     **File Name:** `{}`\n
                     **File Size:** `{}`\n
@@ -187,6 +187,7 @@ async def upload_file(client, message, file_path):
     upload_message = await bot.send_message(chat_id=message.chat.id, text=message_text, reply_to_message_id=message.id)
 
     await bot.send_video(chat_id=group_id, video=file_path, caption=message.caption, progress=update_my_progress,
+                         width=width,height=height,duration=duration,
                          progress_args=(message, upload_message),
                          thumb=thumbnail_path)
     await asyncio.sleep(5)
